@@ -1,6 +1,6 @@
 import tkinter as tk
 import ttkbootstrap as ttk
-from tkinter import messagebox
+from CTkMessagebox import CTkMessagebox
 from ttkbootstrap.constants import *
 from ttkbootstrap import  Menu
 
@@ -18,20 +18,47 @@ class App(tk.Tk):
         self.widgets()
         self.location()
         self.runApp()
+    #message 
+    def errorHandler(self ,erorr_key , name) :
+        errors = {
+            'strError' : f"somting wrong : Plse using string input for this input [ {name} ] ! "
+        }
+        CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
+                  icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
+        
     def wSpace(self ,frame):
         space = ttk.Label(frame, text=" " , padding=(10,10))
         return space
     #Widgets Configs :
-    def widgets(self):
+    #validatopn :
+    def checkString(self , input, name) :
+        prop_name = getattr(self, name  , NONE)
+        if(input.isalpha()):            
+            prop_name.configure(bootstyle="defualt")
+            return True
+        prop_name.configure(bootstyle="danger")
+        return False
 
-        
+    def validation_input(self , input , name):      
+        if(not self.checkString(input , name)) :
+            self.errorHandler('strError' , name)
+            
+   
+
+
+
+
+
+    def widgets(self):        
         #user Info Frame
         self.userInfoFrame = ttk.LabelFrame(self,bootstyle="info", text="User Information", padding=(10,10,10,20))
         self.lable_firstName = ttk.Label(self.userInfoFrame,text="FirstName :"  , padding=(3,3))
         self.firstName_input = ttk.Entry(self.userInfoFrame, width=30)
+        self.firstName_input.bind('<FocusOut>', lambda input : self.validation_input(self.firstName_input.get() , "firstName_input"))
         
         self.lable_lastName = ttk.Label(self.userInfoFrame,text="Last Name :"  , padding=(3,3))
         self.lastName_input = ttk.Entry(self.userInfoFrame, width=30)
+        self.lastName_input.bind('<FocusOut>', lambda input : self.validation_input(self.lastName_input.get() , "lastName_input"))
         
         self.lable_phoneNumber = ttk.Label(self.userInfoFrame,text="Phone Number :"  , padding=(3,3))
         self.phoneNumber_input = ttk.Entry(self.userInfoFrame, width=30)
@@ -41,11 +68,11 @@ class App(tk.Tk):
         
         self.lable_city = ttk.Label(self.userInfoFrame,text="City :"  , padding=(3,3) )
         self.city_comboBox = ttk.Combobox(self.userInfoFrame, width=28 
-                                          , values=["Tehran", "Mashhad", "Isfahan", "Tabriz"])
+                                          , values=["Tehran", "Mashhad", "Isfahan", "Tabriz"], state="readonly")
         
         self.lable_county = ttk.Label(self.userInfoFrame,text="County :"  , padding=(3,3) )
         self.county_comboBox = ttk.Combobox(self.userInfoFrame, width=28 
-                                          , values=["option 1", "option 2", "option 3", "option 4"])
+                                          , values=["option 1", "option 2", "option 3", "option 4"], state="readonly")
         
         self.lable_address = ttk.Label(self.userInfoFrame,text="Address :"  , padding=(3,3) )
         self.address_input = ttk.Entry(self.userInfoFrame)
@@ -64,7 +91,7 @@ class App(tk.Tk):
         
         self.lable_foodType = ttk.Label(self.foodFrame,text="Food Type :"  , padding=(3,3) )
         self.foodType_comboBox = ttk.Combobox(self.foodFrame, width=28 
-                                          , values=["option 1", "option 2", "option 3", "option 4"])
+                                          , values=["option 1", "option 2", "option 3", "option 4"] , state="readonly")
         
         self.lable_foodSize = ttk.Label(self.foodFrame,text="Food Size :"  , padding=(3,3) )
         self.small_radio = ttk.Radiobutton(self.foodFrame, text="Small", value=1 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize )
@@ -110,7 +137,7 @@ class App(tk.Tk):
         
         self.lable_delivery = ttk.Label(self.extraInformation,text="Delivery Time :"  , padding=(3,3) )
         self.delivery_comboBox = ttk.Combobox(self.extraInformation, width=28 
-                                          , values=["option 1", "option 2", "option 3", "option 4"])
+                                          , values=["option 1", "option 2", "option 3", "option 4"], state="readonly")
         
         #cashier section
         self.cashierFrame = ttk.LabelFrame(self,bootstyle="primary", text="Cashier information", padding=(10,10,10,20))
