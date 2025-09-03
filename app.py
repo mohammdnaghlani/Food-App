@@ -16,7 +16,7 @@ class App(tk.Tk):
         self.resizable(False,False)
         self.geometry('950x900')
         ttk.Style("superhero")
-        self.cities = ["Tehran", "Mashhad", "Esfahan", "Tabriz" , 'Alborz']
+        self.cities = ["Tehran", "Alborze", "Azarbaijan Shargh", "Khorasan Razavi" , 'Fars']
         self.widgets()
         self.location()
         self.runApp()
@@ -24,7 +24,9 @@ class App(tk.Tk):
     def errorHandler(self ,erorr_key , name) :
         errors = {
             'strError' : f"somting wrong : please using string input for this input [ {name} ] ! ",
-            'phoneError' : f"somting wrong : your information for [ {name} ] not correct   !"
+            'phoneError' : f"somting wrong : your information for [ {name} ] not correct   !" , 
+            'emptyError' : f"somting wrong :  [ {name} ] is Empty !",
+            'numberError' : f"somting wrong :  Please using Number for [ {name} ] fild !",
         }
         CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
                   icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
@@ -39,6 +41,11 @@ class App(tk.Tk):
     
     def checkString(self , input, name) :
         prop_name = getattr(self, name  , NONE)
+        
+        if(prop_name.get() == ""):
+          prop_name.configure(bootstyle="danger")
+          return False  
+        
         if(input.isalpha()):            
             prop_name.configure(bootstyle="defualt")
             return True
@@ -53,23 +60,54 @@ class App(tk.Tk):
             return True
         prop_name.configure(bootstyle="danger")
         return False
+    def checkEmpty(self , input , name):
+        prop_name = self.getProp(name)
+        if(input == ""):
+            prop_name.configure(bootstyle="danger")
+            return False
+        return True
     
-    def validation_input(self , input , name , slug):
+    def checkNumber(self , input , name):
+        prop_name = self.getProp(name)
+        pattern = r'^\d+' #serach in stackOverFlow and Use it
+        if(re.match(pattern, input)):
+            prop_name.configure(bootstyle="defualt")
+            return True
+        prop_name.configure(bootstyle="danger")
+        return False
+    
+    def validation_input(self , input , name , slug = False):
+        
+        # if(not self.checkEmpty(input , name)):
+        #      self.errorHandler('emptyError' , name)
+        #      return False
               
         if(not self.checkString(input , name) and slug == 'str') :
+            if(not self.checkEmpty(input , name)):
+             self.errorHandler('emptyError' , name)
+             return False
             self.errorHandler('strError' , name)
             
-        if(not self.checkPhone(input , name) and slug == 'phone'):
+        if(not self.checkPhone(input , name)  and slug == 'phone'):
+            if(not self.checkEmpty(input , name)):
+             self.errorHandler('emptyError' , name)
+             return False
             self.errorHandler('phoneError' , name)
+            
+        if(not self.checkEmpty(input , name) and slug == "empty"):
+            self.errorHandler('emptyError' , name)
+             
+        if(not self.checkNumber(input , name ) and slug == "number"):
+            self.errorHandler('numberError' , name)
             
    
     def getCounty(self , event):
         county = {
-            'Tehran' : ["option 1", "option 2", "option 3", "option 4"],
-            'Mashhad' : ["option 5", "option 6", "option 7", "option 8"],
-            'Esfahan' : ["option 9", "option 10", "option 11", "option 12"],
-            'Tabris' : ["option 13", "option 14", "option 15", "option 16"],
-            'Alborz' : ["option 17", "option 18", "option 19", "option 20"],
+            'Tehran' : ["Tehran", "Shemiranat", "Ray", "Varamin" , "Eslam Abad" , "Shahriar"],
+            'Alborze' : ["Karaj", "Fardis", "Talaghan", "Eshtehard" , "Nazar Abad"],
+            'Azarbaijan Shargh' : ["Tabriz", "Maraghe", "Maran", "Mianeh" , "Jolfa" ],
+            'Khorasan Razavi' : ["Mashhad", "Neyshabor", "Sabzevar", "Torghabeh" , "Gonabad"],
+            'Fars' : ["Shiraz", "Jahrom", "Darab", "Pasarghad"],
         }
         countyKey =self.cityVariable.get()
         self.county_comboBox.configure(values=county[countyKey])
@@ -97,6 +135,7 @@ class App(tk.Tk):
          
         self.lable_fixedNumber = ttk.Label(self.userInfoFrame,text="Fixed :"  , padding=(3,3) )
         self.fixedNumber_input = ttk.Entry(self.userInfoFrame, width=30)
+        self.fixedNumber_input.bind('<FocusOut>', lambda input : self.validation_input(self.fixedNumber_input.get() , "fixedNumber_input" , 'phone'))
         
         self.lable_city = ttk.Label(self.userInfoFrame,text="City :"  , padding=(3,3) )
         self.city_comboBox = ttk.Combobox(self.userInfoFrame, width=28 ,textvariable=self.cityVariable
@@ -109,16 +148,19 @@ class App(tk.Tk):
         #---------------------------------
         self.lable_address = ttk.Label(self.userInfoFrame,text="Address :"  , padding=(3,3) )
         self.address_input = ttk.Entry(self.userInfoFrame)
+        self.address_input.bind('<FocusOut>', lambda input : self.validation_input(self.address_input.get() , "address_input",'empty'))
         
         self.lable_HNumber = ttk.Label(self.userInfoFrame,text="House Number :"  , padding=(3,3) )
         self.HNumber_input = ttk.Entry(self.userInfoFrame , width=30)
+        self.HNumber_input.bind('<FocusOut>', lambda input : self.validation_input(self.HNumber_input.get() , "HNumber_input",'number'))
         
         self.lable_unitNumber = ttk.Label(self.userInfoFrame,text="Unit Number :"  , padding=(3,3) )
         self.unitNumber_input = ttk.Entry(self.userInfoFrame , width=30)
+        self.unitNumber_input.bind('<FocusOut>', lambda input : self.validation_input(self.unitNumber_input.get() , "unitNumber_input",'number'))
         
         self.lable_floor = ttk.Label(self.userInfoFrame,text="Floor :"  , padding=(3,3) )
         self.floor_input = ttk.Entry(self.userInfoFrame , width=30)
-        
+        self.floor_input.bind('<FocusOut>', lambda input : self.validation_input(self.floor_input.get() , "floor_input",'str'))
         #food Info Frame
         self.foodFrame = ttk.LabelFrame(self,bootstyle="danger", text="Food Information", padding=(10,10,10,20))
         
