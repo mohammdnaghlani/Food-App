@@ -143,7 +143,7 @@ class App(tk.Tk):
             return False
         self.foodType_comboBox.configure(bootstyle="defualt")
         price = self.priceFood[self.foodVariable.get()]
-        print(price[self.foodSize.get() - 1] )
+        print(price[self.foodSize.get() - 1])
 
 
 
@@ -223,7 +223,7 @@ class App(tk.Tk):
         self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation, text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         self.pepperTopping_input = ttk.Checkbutton(self.extraInformation, text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         self.oliveTopping_input = ttk.Checkbutton(self.extraInformation, text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.onionTopping_input = ttk.Checkbutton(self.extraInformation, text="Onion" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.onionTopping_input = ttk.Checkbutton(self.extraInformation, text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
         self.lable_drink = ttk.Label(self.extraInformation, text="Drink :" , padding=(3,3))
         self.soda_input = ttk.Checkbutton(self.extraInformation, text="Soda" ,bootstyle="success-outline-toolbutton", padding=(3,3))
