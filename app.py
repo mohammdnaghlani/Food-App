@@ -13,20 +13,43 @@ class App(tk.Tk):
         self.foodSize = ttk.IntVar()
         self.peymentMethod = ttk.IntVar()
         self.cityVariable = ttk.StringVar()        
+        self.foodVariable = ttk.StringVar()        
         self.resizable(False,False)
         self.geometry('950x900')
         ttk.Style("superhero")
         self.cities = ["Tehran", "Alborze", "Azarbaijan Shargh", "Khorasan Razavi" , 'Fars']
+        self.foodNames = [
+            "Peperoni" , "GoshtOGharch" , "SirOStaik" , "Sabzijat" , "RostBif" , "Baiken","Margarita" , "ChikenPesto" , "Makhlot" , "Makhsos",
+            "HaberGer" , "CheesBerger" ,"MashromBerger" , "SojokBerger" , "BeikenBerger"
+        ]
+        self.priceFood = {
+            "Peperoni" :[4300000,5300000,5300000],
+            "GoshtOGharch" :[4800000,5800000,6800000],
+            "SirOStaik" :[5200000,6200000,7200000],
+            "Sabzijat" :[4000000,5000000,6000000],
+            "RostBif" :[3500000,4500000,5500000],
+            "Baiken":[4800000,5800000,6800000],
+            "Margarita" :[3000000,4000000,5000000],
+            "ChikenPesto" :[4500000,5500000,6500000],
+            "Makhlot" :[4800000,5800000,6800000], 
+            "Makhsos":[4300000,5300000,6300000],
+            "HaberGer" :[3900000,4900000,5900000],
+            "CheesBerger" :[3200000,4200000,5200000],
+            "MashromBerger" :[3500000,4500000,5500000],
+            "SojokBerger" :[3900000,4900000,5900000],
+            "BeikenBerger":[3400000,4400000,5400000]
+        }
         self.widgets()
         self.location()
         self.runApp()
     #message 
-    def errorHandler(self ,erorr_key , name) :
+    def errorHandler(self ,erorr_key , name = False) :
         errors = {
             'strError' : f"somting wrong : please using string input for this input [ {name} ] ! ",
             'phoneError' : f"somting wrong : your information for [ {name} ] not correct   !" , 
             'emptyError' : f"somting wrong :  [ {name} ] is Empty !",
             'numberError' : f"somting wrong :  Please using Number for [ {name} ] fild !",
+            'FNameError' : f"somting wrong :  Please Select a FOOD !",
         }
         CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
                   icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
@@ -112,8 +135,15 @@ class App(tk.Tk):
         countyKey =self.cityVariable.get()
         self.county_comboBox.configure(values=county[countyKey])
         
-       
 
+    def getFoodSize(self):
+        if(self.foodVariable.get() == "") :
+            self.foodType_comboBox.configure(bootstyle="danger")
+            self.errorHandler("FNameError")
+            return False
+        self.foodType_comboBox.configure(bootstyle="defualt")
+        price = self.priceFood[self.foodVariable.get()]
+        print(price[self.foodSize.get() - 1] )
 
 
 
@@ -161,17 +191,27 @@ class App(tk.Tk):
         self.lable_floor = ttk.Label(self.userInfoFrame,text="Floor :"  , padding=(3,3) )
         self.floor_input = ttk.Entry(self.userInfoFrame , width=30)
         self.floor_input.bind('<FocusOut>', lambda input : self.validation_input(self.floor_input.get() , "floor_input",'str'))
+      
+      
+      
+      
+      
+      
         #food Info Frame
         self.foodFrame = ttk.LabelFrame(self,bootstyle="danger", text="Food Information", padding=(10,10,10,20))
         
         self.lable_foodType = ttk.Label(self.foodFrame,text="Food Type :"  , padding=(3,3) )
         self.foodType_comboBox = ttk.Combobox(self.foodFrame, width=28 
-                                          , values=["option 1", "option 2", "option 3", "option 4"] , state="readonly")
+                                          , values=self.foodNames, textvariable=self.foodVariable , state="readonly")
+        
         
         self.lable_foodSize = ttk.Label(self.foodFrame,text="Food Size :"  , padding=(3,3) )
-        self.small_radio = ttk.Radiobutton(self.foodFrame, text="Small", value=1 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize )
-        self.medium_radio = ttk.Radiobutton(self.foodFrame, text="Medium", value=2 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize )
-        self.large_radio = ttk.Radiobutton(self.foodFrame, text="Large", value=3 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize )
+        self.small_radio = ttk.Radiobutton(self.foodFrame, text="Small", value=1 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize ,
+                                           command= lambda  : self.getFoodSize())
+        self.medium_radio = ttk.Radiobutton(self.foodFrame, text="Medium", value=2 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize ,
+                                             command= lambda  : self.getFoodSize())
+        self.large_radio = ttk.Radiobutton(self.foodFrame, text="Large", value=3 ,bootstyle="primary-outline-toolbutton" , variable=self.foodSize ,
+                                            command= lambda  : self.getFoodSize())
         
         self.foodNumber = ttk.Label(self.foodFrame, text="Food Number :", padding=(3,3))
         self.foodNumber_input = ttk.Spinbox(self.foodFrame,from_=1, to=5, width=5, increment=1)
