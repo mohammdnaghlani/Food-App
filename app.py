@@ -12,11 +12,15 @@ class App(tk.Tk):
         self.spiceLevel= ttk.IntVar()
         self.foodSize = ttk.IntVar()
         self.peymentMethod = ttk.IntVar()
-        self.cityVariable = ttk.StringVar()        
-        self.foodVariable = ttk.StringVar()        
+        self.cityVariable = ttk.StringVar()
+        self.deviveryVar = ttk.StringVar()        
+        self.foodVariable = ttk.StringVar() 
+        self.deliveryPrice = 0  
+        self.foodPrice = False      
         self.resizable(False,False)
         self.geometry('950x900')
         ttk.Style("superhero")
+        self.hasError = False
         self.cities = ["Tehran", "Alborze", "Azarbaijan Shargh", "Khorasan Razavi" , 'Fars']
         self.foodNames = [
             "Peperoni" , "GoshtOGharch" , "SirOStaik" , "Sabzijat" , "RostBif" , "Baiken","Margarita" , "ChikenPesto" , "Makhlot" , "Makhsos",
@@ -25,6 +29,7 @@ class App(tk.Tk):
         self.deliveryItems = [
             "Now" , "Soon" ,"Check Me"
         ]
+        
         self.priceFood = {
             "Peperoni" :[4300000,5300000,5300000],
             "GoshtOGharch" :[4800000,5800000,6800000],
@@ -53,6 +58,29 @@ class App(tk.Tk):
             'cheesCake', 'tiramisu', 'vanilIceCream',          
             'cheese', 'mushroom', 'pepper','olive', 'onion'
         ]
+        self.checkBoxNames = [
+            "frenchfrize_input","garlicBread_input","salad_input","cheescake_input","tiramisu_input","vanilIC_input",
+            "cheeseTopping_input","mushroomTopping_input","pepperTopping_input","oliveTopping_input","onionTopping_input",
+            "soda_input","water_input","maltbeverage_input","dough_input","icetae_input",  
+        ]
+        self.radioNamse = [
+            "small_radio","medium_radio" , "large_radio" ,
+            "normalLevel_radio","mediumLevel_radio","hotLevel_radio",
+            "chash_radio" , "credit_radio" , "Pos_radio",
+        ]
+        self.optionalItemsPrice = {
+           "soda" : 200000,
+           "water" : 100000,
+           "maltbeverage" : 200000,
+           "dough" : 300000,
+           "icetae" : 150000,
+           "fernchFrise" : 1450000,
+           "garlicBread" : 1800000,
+           "salad" : 3000000,
+           "cheesCake" : 2000000,
+           "tiramisu" : 3000000,
+           "vanilIceCream" : 1000000 
+        }
 
         self.countTopping = 0
         self.toppingName = []
@@ -141,22 +169,84 @@ class App(tk.Tk):
             prop = self.getProp(name)
             prop.configure(state = situation)
 
+    def checkRequiredItems(self):
+        requiredItems = [
+            "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input", 
+            "address_input","HNumber_input" ,"unitNumber_input" ,
+        ]
+        if(self.cityVariable.get() == "" or self.deviveryVar.get() == "" or  self.foodVariable.get() == "" ):
+            self.hasError = True 
+        for item in requiredItems:
+            prop = self.getProp(item)
+            if(prop.get() == ""):
+                self.hasError = True
+    def saveToFile(self ,fileName , order , extention = 'txt'   ) :
+        with open(fileName +'.'+ extention , mode = '+a' ) as file :
+            file.write(str(order) + '\n')
 
+        # CTkMessagebox(message="Your Information saved !",
+        #           icon="check", option_1="Ok")
+ 
     def calculation(self):
+        # self.checkRequiredItems()
+        # if(self.hasError):
+        #     self.errorHandler('checkAllItems')
+        #     return False
+        self.price_input.configure(state="normal")
+        self.price_input.delete(0 , ttk.END)
+        self.total_input.configure(state="normal")
+        self.total_input.delete(0 , ttk.END)
+       
         self.order_btn.configure(state="normal")
         self.edit_btn.configure(state="normal")
         self.Calculate_btn.configure(state="disable")
         for name in self.inputnames :
             prop = self.getProp(name)
             prop.configure(state="readonly")
+        for check in self.checkBoxNames:
+            prop = self.getProp(check)
+            prop.configure(state="disable")
+        for radio in self.radioNamse:
+            prop = self.getProp(radio)
+            prop.configure(state="disable")
+        self.foodNumber_input.configure(state="disable")
+        totalPrice = 0
+        totalPrice += (self.countTopping * 100000)
+        totalPrice += self.deliveryPrice   
+        for name in self.OptionalName :
+            totalPrice += self.optionalItemsPrice[name]
+        
+        totalPrice += (self.foodPrice * self.foodNumber_var.get() )
+        
+       
+        self.price_input.insert(0 , totalPrice) 
+        self.price_input.configure(state="readonly")
+        if( self.discountCode_input.get().lower() == 'offer20') :
+            totalPrice = totalPrice - ((totalPrice*20) / 100)
+        # print(totalPrice ,self.foodNumber_var.get())
+        self.total_input.insert(0 , totalPrice) 
+        self.total_input.configure(state="readonly")
+        
+    
+    def saveOrder(self):
+        order = [self.toppingName , self.OptionalName , self.deviveryVar.get() ]
+        self.saveToFile(self.firstName_input.get()+'-'+self.lastName_input.get() , order)
             
     def edit(self):
         self.order_btn.configure(state="disable")
         self.edit_btn.configure(state="disable")
         self.Calculate_btn.configure(state="normal")
+        self.foodNumber_input.configure(state="readonly")
         for name in self.inputnames :
             prop = self.getProp(name)
             prop.configure(state="normal")
+        for check in self.checkBoxNames:
+            prop = self.getProp(check)
+            prop.configure(state="normal")
+        for radio in self.radioNamse:
+            prop = self.getProp(radio)
+            prop.configure(state="normal")
+        
     def cleanData(self):        
         for name in self.inputnames :
             prop = self.getProp(name)
@@ -166,13 +256,18 @@ class App(tk.Tk):
         for radio in self.radionameVar:
             prop = self.getProp(radio+"_var")
             prop.set(False)
-        
+        self.deliveryPrice = 0
+        self.spiceLevel.set(False)
+        self.foodSize.set(False)
+        self.peymentMethod.set(False)
         self.countTopping = 0
         self.toppingName = []
         self.sLevelSelect = 0
         self.sLevelName = False
         self.countOptionalItem = 0
         self.OptionalName = []
+        self.foodPrice = False
+        self.foodNumber_var.set(1)
         
         self.update()
         self.firstName_input.focus_set()
@@ -181,13 +276,15 @@ class App(tk.Tk):
 
     #message 
     def errorHandler(self ,erorr_key , name = False) :
+        self.hasError = True
         errors = {
             'strError' : f"somting wrong : please using string input for this input [ {name} ] ! ",
             'phoneError' : f"somting wrong : your information for [ {name} ] not correct   !" , 
             'emptyError' : f"somting wrong :  [ {name} ] is Empty !",
             'numberError' : f"somting wrong :  Please using Number for [ {name} ] fild !",
-            'FNameError' : f"somting wrong :  Please Select a FOOD !",
-            'limitSelectd' : f"somting wrong :  You can select 3 items !",
+            'FNameError' : "somting wrong :  Please Select a FOOD !",
+            'limitSelectd' : "somting wrong :  You can select 3 items !",
+            'checkAllItems' :  "somting wrong : Please check All Filds " 
         }
         CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
                   icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
@@ -248,20 +345,28 @@ class App(tk.Tk):
              self.errorHandler('emptyError' , name)
              return False
             self.errorHandler('strError' , name)
-            
+            return False
         if(not self.checkPhone(input , name)  and slug == 'phone'):
             if(not self.checkEmpty(input , name)):
              self.errorHandler('emptyError' , name)
              return False
             self.errorHandler('phoneError' , name)
-            
+            return False
         if(not self.checkEmpty(input , name) and slug == "empty"):
             self.errorHandler('emptyError' , name)
-             
+            return False
         if(not self.checkNumber(input , name ) and slug == "number"):
             self.errorHandler('numberError' , name)
+            return False
+        self.hasError = False
+    def getDelivery(self , event) :
+        temp = self.deviveryVar.get()
+        if(temp.lower() == "now") :
+            self.deliveryPrice = 100000
+        else:
+            self.deliveryPrice = 50000
+        return
             
-   
     def getCounty(self , event):
         county = {
             'Tehran' : ["Tehran", "Shemiranat", "Ray", "Varamin" , "Eslam Abad" , "Shahriar"],
@@ -281,7 +386,7 @@ class App(tk.Tk):
             return False
         self.foodType_comboBox.configure(bootstyle="defualt")
         price = self.priceFood[self.foodVariable.get()]
-        print(price[self.foodSize.get() - 1])
+        self.foodPrice = price[self.foodSize.get() - 1]  
 
 
 
@@ -352,7 +457,8 @@ class App(tk.Tk):
                                             command= lambda  : self.getFoodSize())
         
         self.foodNumber = ttk.Label(self.foodFrame, text="Food Number :", padding=(3,3))
-        self.foodNumber_input = ttk.Spinbox(self.foodFrame,from_=1, to=5, width=5, increment=1)
+        self.foodNumber_var = tk.IntVar(value=1)
+        self.foodNumber_input = ttk.Spinbox(self.foodFrame,from_=1,state="readonly", to=5, width=5, increment=1 , textvariable=self.foodNumber_var)
         #'cheese', 'mushroom', 'pepper','olive', 'onion'
         #extra information Frame
         self.extraInformation = ttk.Labelframe(self,bootstyle="warning", text="Extra Information", padding=(10,10,10,20))
@@ -460,7 +566,9 @@ class App(tk.Tk):
         
         self.lable_delivery = ttk.Label(self.extraInformation,text="Delivery Time :"  , padding=(3,3) )
         self.delivery_comboBox = ttk.Combobox(self.extraInformation, width=28 
-                                          , values=self.deliveryItems, state="readonly")
+                                          , values=self.deliveryItems, state="readonly" , textvariable=self.deviveryVar 
+                                        )
+        self.delivery_comboBox.bind('<<ComboboxSelected>>', self.getDelivery)
         
 
 
@@ -492,7 +600,7 @@ class App(tk.Tk):
         self.Calculate_btn = ttk.Button(self.operationFrame, text="Calculate", bootstyle="success-outline",width=20 ,command=self.calculation)
         self.edit_btn = ttk.Button(self.operationFrame, text="Edit", bootstyle="primary-outline",width=20 , state="disable",command=self.edit)
         self.close_btn = ttk.Button(self.operationFrame, text="Close", bootstyle="danger-outline",width=20 , command=self.closeApp)
-        self.order_btn = ttk.Button(self.operationFrame, text="Order", bootstyle="success-outline",width=20 , state="disable")
+        self.order_btn = ttk.Button(self.operationFrame,command=self.saveOrder, text="Order", bootstyle="success-outline",width=20 , state="disable")
        
         #menubar
         self.menubar = Menu(self)
