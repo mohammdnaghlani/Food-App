@@ -22,6 +22,9 @@ class App(tk.Tk):
             "Peperoni" , "GoshtOGharch" , "SirOStaik" , "Sabzijat" , "RostBif" , "Baiken","Margarita" , "ChikenPesto" , "Makhlot" , "Makhsos",
             "HaberGer" , "CheesBerger" ,"MashromBerger" , "SojokBerger" , "BeikenBerger"
         ]
+        self.deliveryItems = [
+            "Now" , "Soon" ,"Check Me"
+        ]
         self.priceFood = {
             "Peperoni" :[4300000,5300000,5300000],
             "GoshtOGharch" :[4800000,5800000,6800000],
@@ -39,9 +42,75 @@ class App(tk.Tk):
             "SojokBerger" :[3900000,4900000,5900000],
             "BeikenBerger":[3400000,4400000,5400000]
         }
+        self.countTopping = 0
+        self.toppingName = []
+
+        self.countDrink = 0
+        self.drinkName = []
+
+        self.sLevelSelect = 0
+        self.sLevelName = False
         self.widgets()
         self.location()
         self.runApp()
+
+    def selectSlevel(self):
+        match(self.spiceLevel.get()):
+            case 1 :
+                self.sLevelSelect = 1
+                self.sLevelName = "Normal"
+                
+            case 2 :
+                self.sLevelSelect = 2
+                self.sLevelName = "Medium"
+                
+            case 3 :
+                self.sLevelSelect = 3
+                self.sLevelName = "Hot"
+        print(self.sLevelName , self.sLevelSelect)
+
+        
+
+    def selectDrink(self , drink_name , variable):
+        if variable.get() :            
+            self.countDrink +=1
+            self.drinkName.append(drink_name)
+        else : 
+            variable.set(False) 
+            self.drinkName.remove(drink_name)
+            self.countDrink -=1
+        
+        print(self.countDrink ,  self.drinkName)
+
+
+
+
+    def selectTopping(self , topping_name , variable):
+        if(self.countTopping == 3 and variable.get()):
+            variable.set(False)
+            self.errorHandler("limitSelectd")
+            return
+        
+        if variable.get() :
+            if(self.countTopping < 3 ):
+                self.countTopping +=1
+                self.toppingName.append(topping_name)
+            else:
+                variable.set(False)                
+                return
+        else : 
+            self.toppingName.remove(topping_name)
+            self.countTopping -=1
+        
+        print(self.countTopping , self.toppingName)
+
+
+
+
+
+
+
+
     #message 
     def errorHandler(self ,erorr_key , name = False) :
         errors = {
@@ -50,6 +119,7 @@ class App(tk.Tk):
             'emptyError' : f"somting wrong :  [ {name} ] is Empty !",
             'numberError' : f"somting wrong :  Please using Number for [ {name} ] fild !",
             'FNameError' : f"somting wrong :  Please Select a FOOD !",
+            'limitSelectd' : f"somting wrong :  You can select 3 items !",
         }
         CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
                   icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
@@ -219,23 +289,65 @@ class App(tk.Tk):
         self.extraInformation = ttk.Labelframe(self,bootstyle="warning", text="Extra Information", padding=(10,10,10,20))
         
         self.lable_extraToppings = ttk.Label(self.extraInformation, text="Extra Toppings :" , padding=(3,3))
-        self.cheeseTopping_input = ttk.Checkbutton(self.extraInformation, text="Cheese" ,bootstyle="success-outline-toolbutton", padding=(3,3))
-        self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation, text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.pepperTopping_input = ttk.Checkbutton(self.extraInformation, text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.oliveTopping_input = ttk.Checkbutton(self.extraInformation, text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.onionTopping_input = ttk.Checkbutton(self.extraInformation, text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
+        self.cheesTopping_var = tk.BooleanVar()
+        self.cheeseTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.cheesTopping_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.cheesTopping_var),
+                                                    text="Cheese" ,bootstyle="success-outline-toolbutton", padding=(3,3))
+        self.mushroomTopping_var = tk.BooleanVar()
+        self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.mushroomTopping_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.mushroomTopping_var), text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+       
+        self.pepperTopping_var = tk.BooleanVar()
+        self.pepperTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.pepperTopping_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.pepperTopping_var), text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
+        self.oliveTopping_var = tk.BooleanVar()
+        self.oliveTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.oliveTopping_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.oliveTopping_var), text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
+        self.onionTopping_var = tk.BooleanVar()
+        self.onionTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.onionTopping_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.onionTopping_var), text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
+
+        self.soda_var = ttk.BooleanVar()
+        self.water_var = ttk.BooleanVar()
+        self.maltbeverage_var = ttk.BooleanVar()
+        self.dough_var = ttk.BooleanVar()
+        self.icetae_var = ttk.BooleanVar()
         self.lable_drink = ttk.Label(self.extraInformation, text="Drink :" , padding=(3,3))
-        self.soda_input = ttk.Checkbutton(self.extraInformation, text="Soda" ,bootstyle="success-outline-toolbutton", padding=(3,3))
-        self.water_input = ttk.Checkbutton(self.extraInformation, text="Water" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.maltbeverage_input = ttk.Checkbutton(self.extraInformation, text="Malt Beverage" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.dough_input = ttk.Checkbutton(self.extraInformation, text="Dough" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
-        self.icetae_input = ttk.Checkbutton(self.extraInformation, text="IceTae" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
-        self.lable_spicinessLevel = ttk.Label(self.extraInformation,text="Food Size :"  , padding=(3,3) )
-        self.normalLevel_radio = ttk.Radiobutton(self.extraInformation, text="Normal", value=1 ,bootstyle="primary-outline-toolbutton",variable=self.spiceLevel)
-        self.mediumLevel_radio = ttk.Radiobutton(self.extraInformation, text="Medium", value=2 ,bootstyle="primary-outline-toolbutton",variable=self.spiceLevel)
-        self.hotLevel_radio = ttk.Radiobutton(self.extraInformation, text="Hot", value=3 ,bootstyle="primary-outline-toolbutton",variable=self.spiceLevel)
+        self.soda_input = ttk.Checkbutton(self.extraInformation,
+                                          variable=self.soda_var , command=lambda:self.selectDrink("Soda" , self.soda_var),
+                                           text="Soda" ,bootstyle="success-outline-toolbutton", padding=(3,3))
+        self.water_input = ttk.Checkbutton(self.extraInformation,
+                                            variable=self.water_var , command=lambda:self.selectDrink("Water" , self.water_var),
+                                            text="Water" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.maltbeverage_input = ttk.Checkbutton(self.extraInformation,
+                                                   variable=self.maltbeverage_var , command=lambda:self.selectDrink("Maltbeverage" , self.maltbeverage_var),
+                                                   text="Malt Beverage" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.dough_input = ttk.Checkbutton(self.extraInformation,
+                                           variable=self.dough_var , command=lambda:self.selectDrink("Dough" , self.dough_var),
+                                           text="Dough" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.icetae_input = ttk.Checkbutton(self.extraInformation,
+                                             variable=self.icetae_var , command=lambda:self.selectDrink("Ice Tae" , self.icetae_var),
+                                             text="IceTae" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
+        
+        
+        
+        self.lable_spicinessLevel = ttk.Label(self.extraInformation,text="Spiciness Level :"  , padding=(3,3) )
+      
+        self.normalLevel_radio = ttk.Radiobutton(self.extraInformation,
+                                                 variable=self.spiceLevel  , command=lambda : self.selectSlevel(),
+                                                  text="Normal", value=1 ,bootstyle="primary-outline-toolbutton")
+        self.mediumLevel_radio = ttk.Radiobutton(self.extraInformation, text="Medium",
+                                                 variable=self.spiceLevel, command=lambda : self.selectSlevel(),
+                                                  value=2 ,bootstyle="primary-outline-toolbutton")
+        self.hotLevel_radio = ttk.Radiobutton(self.extraInformation,
+                                               variable=self.spiceLevel, command=lambda : self.selectSlevel(),
+                                               text="Hot", value=3 ,bootstyle="primary-outline-toolbutton")
         
         self.lable_appetizer = ttk.Label(self.extraInformation, text="Appetizer :" , padding=(3,3))
         self.frenchfrize_input = ttk.Checkbutton(self.extraInformation, text="French Frise" ,bootstyle="success-outline-toolbutton", padding=(3,3))
@@ -252,7 +364,7 @@ class App(tk.Tk):
         
         self.lable_delivery = ttk.Label(self.extraInformation,text="Delivery Time :"  , padding=(3,3) )
         self.delivery_comboBox = ttk.Combobox(self.extraInformation, width=28 
-                                          , values=["option 1", "option 2", "option 3", "option 4"], state="readonly")
+                                          , values=self.deliveryItems, state="readonly")
         
         #cashier section
         self.cashierFrame = ttk.LabelFrame(self,bootstyle="primary", text="Cashier information", padding=(10,10,10,20))
