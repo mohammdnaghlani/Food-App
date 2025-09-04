@@ -42,6 +42,12 @@ class App(tk.Tk):
             "SojokBerger" :[3900000,4900000,5900000],
             "BeikenBerger":[3400000,4400000,5400000]
         }
+        self.inputnames = [
+           "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input",           
+           "address_input","HNumber_input" ,"unitNumber_input" ,"specialIns_input",
+           "floor_input" ,"foodNumber_input" ,"discountCode_input"
+        ]
+
         self.countTopping = 0
         self.toppingName = []
 
@@ -56,6 +62,10 @@ class App(tk.Tk):
         self.widgets()
         self.location()
         self.runApp()
+
+    def selectPaymentMetyhod(self):
+        print(self.peymentMethod.get())
+    
 
     def selectOptionalItem(self, optional_name , variable):
         if variable.get() :            
@@ -119,10 +129,20 @@ class App(tk.Tk):
         print(self.countTopping , self.toppingName)
 
 
+    def changeStat(self , situation) :
+        
+        for name in self.inputnames :
+            prop = self.getProp(name)
+            prop.configure(state = situation)
 
 
-
-
+    def calculation(self):
+        self.order_btn.configure(state="normal")
+        self.edit_btn.configure(state="normal")
+        self.Calculate_btn.configure(state="disable")
+        for name in self.inputnames :
+            prop = self.getProp(name)
+            prop.configure(state="readonly")
 
 
     #message 
@@ -275,7 +295,7 @@ class App(tk.Tk):
         self.lable_floor = ttk.Label(self.userInfoFrame,text="Floor :"  , padding=(3,3) )
         self.floor_input = ttk.Entry(self.userInfoFrame , width=30)
         self.floor_input.bind('<FocusOut>', lambda input : self.validation_input(self.floor_input.get() , "floor_input",'str'))
-      
+        
       
       
       
@@ -305,24 +325,26 @@ class App(tk.Tk):
         self.lable_extraToppings = ttk.Label(self.extraInformation, text="Extra Toppings :" , padding=(3,3))
         
         self.cheesTopping_var = tk.BooleanVar()
+
+        
         self.cheeseTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.cheesTopping_var,
                                                     command= lambda : self.selectTopping("Cheese" , self.cheesTopping_var),
                                                     text="Cheese" ,bootstyle="success-outline-toolbutton", padding=(3,3))
         self.mushroomTopping_var = tk.BooleanVar()
         self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.mushroomTopping_var,
-                                                    command= lambda : self.selectTopping("Cheese" , self.mushroomTopping_var), text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+                                                    command= lambda : self.selectTopping("Mushroom" , self.mushroomTopping_var), text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
        
         self.pepperTopping_var = tk.BooleanVar()
         self.pepperTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.pepperTopping_var,
-                                                    command= lambda : self.selectTopping("Cheese" , self.pepperTopping_var), text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+                                                    command= lambda : self.selectTopping("Pepper" , self.pepperTopping_var), text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
         self.oliveTopping_var = tk.BooleanVar()
         self.oliveTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.oliveTopping_var,
-                                                    command= lambda : self.selectTopping("Cheese" , self.oliveTopping_var), text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+                                                    command= lambda : self.selectTopping("Olive" , self.oliveTopping_var), text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
         self.onionTopping_var = tk.BooleanVar()
         self.onionTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.onionTopping_var,
-                                                    command= lambda : self.selectTopping("Cheese" , self.onionTopping_var), text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
+                                                    command= lambda : self.selectTopping("Onion" , self.onionTopping_var), text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
 
         self.soda_var = ttk.BooleanVar()
@@ -332,6 +354,7 @@ class App(tk.Tk):
         self.icetae_var = ttk.BooleanVar()
         self.lable_drink = ttk.Label(self.extraInformation, text="Drink :" , padding=(3,3))
         
+
         self.soda_input = ttk.Checkbutton(self.extraInformation,
                                           variable=self.soda_var , command=lambda:self.selectOptionalItem("soda" , self.soda_var),
                                            text="Soda" ,bootstyle="success-outline-toolbutton", padding=(3,3))
@@ -345,8 +368,9 @@ class App(tk.Tk):
                                            variable=self.dough_var , command=lambda:self.selectOptionalItem("dough" , self.dough_var),
                                            text="Dough" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         self.icetae_input = ttk.Checkbutton(self.extraInformation,
-                                             variable=self.icetae_var , command=lambda:self.selectOptionalItem("ice_tae" , self.icetae_var),
+                                             variable=self.icetae_var , command=lambda:self.selectOptionalItem("icetae" , self.icetae_var),
                                              text="IceTae" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
         
         
         
@@ -367,15 +391,17 @@ class App(tk.Tk):
         self.fernchFrise_var = ttk.BooleanVar()
         self.garlicBread_var = ttk.BooleanVar()
         self.salad_var = ttk.BooleanVar()
+
+        
         self.lable_appetizer = ttk.Label(self.extraInformation, text="Appetizer :" , padding=(3,3))
         self.frenchfrize_input = ttk.Checkbutton(self.extraInformation,
-                                                  variable=self.fernchFrise_var , command=lambda : self.selectOptionalItem('French_Frise' , self.fernchFrise_var),
+                                                  variable=self.fernchFrise_var , command=lambda : self.selectOptionalItem('fernchFrise' , self.fernchFrise_var),
                                                   text="French Frise" ,bootstyle="success-outline-toolbutton", padding=(3,3))
         self.garlicBread_input = ttk.Checkbutton(self.extraInformation,
-                                                  variable=self.garlicBread_var , command=lambda : self.selectOptionalItem('Garlic_Bread' , self.garlicBread_var),
+                                                  variable=self.garlicBread_var , command=lambda : self.selectOptionalItem('garlicBread' , self.garlicBread_var),
                                                   text="Garlic Bread" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         self.salad_input = ttk.Checkbutton(self.extraInformation,
-                                            variable=self.salad_var , command=lambda : self.selectOptionalItem('Salad' , self.salad_var),
+                                            variable=self.salad_var , command=lambda : self.selectOptionalItem('salad' , self.salad_var),
                                             text="Salad" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
         self.cheesCake_var=ttk.BooleanVar()
@@ -383,14 +409,16 @@ class App(tk.Tk):
         self.vanilIceCream_var=ttk.BooleanVar()
         self.lable_dessert = ttk.Label(self.extraInformation, text="Dessert :" , padding=(3,3))
         self.cheescake_input = ttk.Checkbutton(self.extraInformation,
-                                                variable=self.cheesCake_var , command=lambda : self.selectOptionalItem('Chees_Cake' , self.cheesCake_var),
+                                                variable=self.cheesCake_var , command=lambda : self.selectOptionalItem('cheesCake' , self.cheesCake_var),
                                                 text="Chees Cake" ,bootstyle="success-outline-toolbutton", padding=(3,3))
         self.tiramisu_input = ttk.Checkbutton(self.extraInformation, 
-                                              variable=self.tiramisu_var , command=lambda : self.selectOptionalItem('Tiramisu' , self.tiramisu_var),
+                                              variable=self.tiramisu_var , command=lambda : self.selectOptionalItem('tiramisu' , self.tiramisu_var),
                                               text="Tiramisu" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         self.vanilIC_input = ttk.Checkbutton(self.extraInformation, 
-                                             variable=self.vanilIceCream_var , command=lambda : self.selectOptionalItem('Vanil_Ice_Cream' , self.vanilIceCream_var),
+                                             variable=self.vanilIceCream_var , command=lambda : self.selectOptionalItem('vanilIceCream' , self.vanilIceCream_var),
                                              text="Vanil Ice Cream" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        
+        
         
         self.lable_specialIns = ttk.Label(self.extraInformation,text="Special Instructions :"  , padding=(3,3) )
         self.specialIns_input = ttk.Entry(self.extraInformation , width=30)
@@ -399,12 +427,20 @@ class App(tk.Tk):
         self.delivery_comboBox = ttk.Combobox(self.extraInformation, width=28 
                                           , values=self.deliveryItems, state="readonly")
         
+
+
         #cashier section
         self.cashierFrame = ttk.LabelFrame(self,bootstyle="primary", text="Cashier information", padding=(10,10,10,20))
         self.pymentMethod_lable = ttk.Label(self.cashierFrame, text="Payment Method :" , padding=(3,3))
-        self.chash_radio = ttk.Radiobutton(self.cashierFrame,width=38 ,text="Chash", value=1 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
-        self.credit_radio = ttk.Radiobutton(self.cashierFrame,width=38 , text="Credit", value=2 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
-        self.Pos_radio = ttk.Radiobutton(self.cashierFrame,width=38 , text="POS", value=3 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
+        self.chash_radio = ttk.Radiobutton(self.cashierFrame,width=38 ,
+                                           command=lambda : self.selectPaymentMetyhod() , 
+                                           text="Chash", value=1 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
+        self.credit_radio = ttk.Radiobutton(self.cashierFrame,width=38 , 
+                                            command=lambda : self.selectPaymentMetyhod() , 
+                                            text="Credit", value=2 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
+        self.Pos_radio = ttk.Radiobutton(self.cashierFrame,width=38 , 
+                                         command=lambda : self.selectPaymentMetyhod() , 
+                                         text="POS", value=3 ,bootstyle="warning-outline-toolbutton" , variable=self.peymentMethod )
 
         self.label_price = ttk.Label(self.cashierFrame, text="Price :" , padding=(3,3))
         self.price_input = ttk.Entry(self.cashierFrame , width=30 , state="readonly")
@@ -418,10 +454,10 @@ class App(tk.Tk):
         #opration buttons
         self.operationFrame = ttk.Labelframe(self,bootstyle="success", text="Operations", padding=(100,10,10,20))
         self.clear_btn = ttk.Button(self.operationFrame, text="Clear", bootstyle="warning-outline",width=20) 
-        self.Calculate_btn = ttk.Button(self.operationFrame, text="Calculate", bootstyle="success-outline",width=20)
-        self.edit_btn = ttk.Button(self.operationFrame, text="Edit", bootstyle="primary-outline",width=20)
-        self.close_btn = ttk.Button(self.operationFrame, text="Close", bootstyle="danger-outline",width=20)
-        self.order_btn = ttk.Button(self.operationFrame, text="Order", bootstyle="success-outline",width=20)
+        self.Calculate_btn = ttk.Button(self.operationFrame, text="Calculate", bootstyle="success-outline",width=20 ,command=self.calculation)
+        self.edit_btn = ttk.Button(self.operationFrame, text="Edit", bootstyle="primary-outline",width=20 , state="disable")
+        self.close_btn = ttk.Button(self.operationFrame, text="Close", bootstyle="danger-outline",width=20 , command=self.closeApp)
+        self.order_btn = ttk.Button(self.operationFrame, text="Order", bootstyle="success-outline",width=20 , state="disable")
        
         #menubar
         self.menubar = Menu(self)
@@ -430,7 +466,7 @@ class App(tk.Tk):
         firstMenu.add_command(label="option 1")
         firstMenu.add_command(label="Option 2")
         firstMenu.add_separator()
-        firstMenu.add_command(label="Option 3")
+        firstMenu.add_command(label="Exit" , command=self.closeApp)
         ##-----------------
         secondMenu = Menu(self.menubar, tearoff=False)
         self.menubar.add_cascade(label="Second Menu", menu=secondMenu)
@@ -556,5 +592,7 @@ class App(tk.Tk):
         self.close_btn.grid(row=0, column=4, padx=5, pady=5, sticky="ew")        
     def runApp(self):
         self.mainloop()
+    def closeApp(self):
+        self.destroy()
         
 app = App()
