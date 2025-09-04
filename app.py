@@ -43,9 +43,15 @@ class App(tk.Tk):
             "BeikenBerger":[3400000,4400000,5400000]
         }
         self.inputnames = [
-           "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input",           
-           "address_input","HNumber_input" ,"unitNumber_input" ,"specialIns_input",
-           "floor_input" ,"foodNumber_input" ,"discountCode_input"
+            "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input",           
+            "address_input","HNumber_input" ,"unitNumber_input" ,"specialIns_input",
+            "floor_input" ,"foodNumber_input" ,"discountCode_input"
+        ]
+        self.radionameVar = [
+            'soda', 'water', 'maltbeverage', 'dough', 'icetae',
+            'fernchFrise', 'garlicBread', 'salad',
+            'cheesCake', 'tiramisu', 'vanilIceCream',          
+            'cheese', 'mushroom', 'pepper','olive', 'onion'
         ]
 
         self.countTopping = 0
@@ -143,6 +149,34 @@ class App(tk.Tk):
         for name in self.inputnames :
             prop = self.getProp(name)
             prop.configure(state="readonly")
+            
+    def edit(self):
+        self.order_btn.configure(state="disable")
+        self.edit_btn.configure(state="disable")
+        self.Calculate_btn.configure(state="normal")
+        for name in self.inputnames :
+            prop = self.getProp(name)
+            prop.configure(state="normal")
+    def cleanData(self):        
+        for name in self.inputnames :
+            prop = self.getProp(name)
+            prop.configure(state="normal")
+            prop.delete(0,tk.END)
+            
+        for radio in self.radionameVar:
+            prop = self.getProp(radio+"_var")
+            prop.set(False)
+        
+        self.countTopping = 0
+        self.toppingName = []
+        self.sLevelSelect = 0
+        self.sLevelName = False
+        self.countOptionalItem = 0
+        self.OptionalName = []
+        
+        self.update()
+        self.firstName_input.focus_set()
+        
 
 
     #message 
@@ -319,32 +353,33 @@ class App(tk.Tk):
         
         self.foodNumber = ttk.Label(self.foodFrame, text="Food Number :", padding=(3,3))
         self.foodNumber_input = ttk.Spinbox(self.foodFrame,from_=1, to=5, width=5, increment=1)
+        #'cheese', 'mushroom', 'pepper','olive', 'onion'
         #extra information Frame
         self.extraInformation = ttk.Labelframe(self,bootstyle="warning", text="Extra Information", padding=(10,10,10,20))
         
         self.lable_extraToppings = ttk.Label(self.extraInformation, text="Extra Toppings :" , padding=(3,3))
         
-        self.cheesTopping_var = tk.BooleanVar()
+        self.cheese_var = tk.BooleanVar()
 
         
-        self.cheeseTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.cheesTopping_var,
-                                                    command= lambda : self.selectTopping("Cheese" , self.cheesTopping_var),
+        self.cheeseTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.cheese_var,
+                                                    command= lambda : self.selectTopping("Cheese" , self.cheese_var),
                                                     text="Cheese" ,bootstyle="success-outline-toolbutton", padding=(3,3))
-        self.mushroomTopping_var = tk.BooleanVar()
-        self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.mushroomTopping_var,
-                                                    command= lambda : self.selectTopping("Mushroom" , self.mushroomTopping_var), text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.mushroom_var = tk.BooleanVar()
+        self.mushroomTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.mushroom_var,
+                                                    command= lambda : self.selectTopping("Mushroom" , self.mushroom_var), text="Mushroom" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
        
-        self.pepperTopping_var = tk.BooleanVar()
-        self.pepperTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.pepperTopping_var,
-                                                    command= lambda : self.selectTopping("Pepper" , self.pepperTopping_var), text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.pepper_var = tk.BooleanVar()
+        self.pepperTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.pepper_var,
+                                                    command= lambda : self.selectTopping("Pepper" , self.pepper_var), text="Pepper" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
-        self.oliveTopping_var = tk.BooleanVar()
-        self.oliveTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.oliveTopping_var,
-                                                    command= lambda : self.selectTopping("Olive" , self.oliveTopping_var), text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.olive_var = tk.BooleanVar()
+        self.oliveTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.olive_var,
+                                                    command= lambda : self.selectTopping("Olive" , self.olive_var), text="Olive" ,bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
-        self.onionTopping_var = tk.BooleanVar()
-        self.onionTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.onionTopping_var,
-                                                    command= lambda : self.selectTopping("Onion" , self.onionTopping_var), text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
+        self.onion_var = tk.BooleanVar()
+        self.onionTopping_input = ttk.Checkbutton(self.extraInformation,variable=self.onion_var,
+                                                    command= lambda : self.selectTopping("Onion" , self.onion_var), text="Onion",bootstyle="success-outline-toolbutton", padding=(3,3)) 
         
 
         self.soda_var = ttk.BooleanVar()
@@ -453,9 +488,9 @@ class App(tk.Tk):
         
         #opration buttons
         self.operationFrame = ttk.Labelframe(self,bootstyle="success", text="Operations", padding=(100,10,10,20))
-        self.clear_btn = ttk.Button(self.operationFrame, text="Clear", bootstyle="warning-outline",width=20) 
+        self.clear_btn = ttk.Button(self.operationFrame,command=self.cleanData , text="Clear", bootstyle="warning-outline",width=20) 
         self.Calculate_btn = ttk.Button(self.operationFrame, text="Calculate", bootstyle="success-outline",width=20 ,command=self.calculation)
-        self.edit_btn = ttk.Button(self.operationFrame, text="Edit", bootstyle="primary-outline",width=20 , state="disable")
+        self.edit_btn = ttk.Button(self.operationFrame, text="Edit", bootstyle="primary-outline",width=20 , state="disable",command=self.edit)
         self.close_btn = ttk.Button(self.operationFrame, text="Close", bootstyle="danger-outline",width=20 , command=self.closeApp)
         self.order_btn = ttk.Button(self.operationFrame, text="Order", bootstyle="success-outline",width=20 , state="disable")
        
