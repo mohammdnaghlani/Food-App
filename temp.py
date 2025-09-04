@@ -1,37 +1,32 @@
-import tkinter as tk
-import ttkbootstrap as tb
+inputnames = [
+           "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input",           
+           "address_input","HNumber_input" ,"unitNumber_input" ,"specialIns_input",
+           "floor_input" ,"foodNumber_input" ,"discountCode_input"
+        ]
+comboBoxNames = ["city_comboBox","county_comboBox","foodType_comboBox" ,"delivery_comboBox"]
+radioNamse = [
+     "small_radio","medium_radio" , "large_radio" ,
+     "normalLevel_radio","mediumLevel_radio","hotLevel_radio",
+     "chash_radio" , "credit_radio" , "Pos_radio",
+]
+checkBoxNames = [
+   "frenchfrize_input","garlicBread_input","salad_input","cheescake_input","tiramisu_input","vanilIC_input",
+   "cheeseTopping_input","mushroomTopping_input","pepperTopping_input","oliveTopping_input","onionTopping_input",
+   "soda_input","water_input","maltbeverage_input","dough_input","icetae_input",  
+]
 
-class MyComboboxApp:
-    def __init__(self, master):
-        self.master = master
-        master.title("Combobox Value Retrieval")
+radionameVar = [
+    'soda', 'water', 'maltbeverage', 'dough', 'icetae',
+    'fernchFrise', 'garlicBread', 'salad',
+    'cheesCake', 'tiramisu', 'vanilIceCream',          
+    'Cheese', 'Mushroom', 'Pepper','Olive', 'Onion'
+    ]
 
-        # Create a StringVar to hold the combobox value
-        self.selected_value = tk.StringVar()
-
-        # Create the Combobox
-        self.my_combobox = tb.Combobox(
-            master,
-            textvariable=self.selected_value,
-            values=["Option A", "Option B", "Option C"]
-        )
-        self.my_combobox.pack(pady=20)
-
-        # Bind the <<ComboboxSelected>> event to a method
-        self.my_combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
-
-        # Label to display the selected value
-        self.display_label = tb.Label(master, text="Selected: None")
-        self.display_label.pack()
-
-    def on_combobox_select(self, event):
-        """
-        Callback method executed when a new item is selected in the Combobox.
-        """
-        current_selection = self.selected_value.get()
-        self.display_label.config(text=f"Selected: {current_selection}")
-
-if __name__ == "__main__":
-    root = tb.Window(themename="superhero")
-    app = MyComboboxApp(root)
-    root.mainloop()
+all= [
+           "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input","city_comboBox","county_comboBox","address_input",
+           "HNumber_input" , "unitNumber_input" , "floor_input" ,"foodType_comboBox" ,"small_radio","medium_radio" , "large_radio" ,
+           "foodNumber_input" , "cheeseTopping_input","mushroomTopping_input","pepperTopping_input","oliveTopping_input","onionTopping_input",
+           "soda_input","water_input","maltbeverage_input","dough_input","icetae_input","normalLevel_radio","mediumLevel_radio","hotLevel_radio",
+           "frenchfrize_input","garlicBread_input","salad_input","cheescake_input","tiramisu_input","vanilIC_input","specialIns_input","delivery_comboBox",
+           "chash_radio" , "credit_radio" , "Pos_radio","discountCode_input"
+        ]
