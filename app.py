@@ -5,6 +5,7 @@ from ttkbootstrap.constants import *
 from ttkbootstrap import  Menu
 import re
 
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -112,20 +113,20 @@ class App(tk.Tk):
         
         print(self.countOptionalItem ,  self.OptionalName)
 
-    def selectSlevel(self):
-        match(self.spiceLevel.get()):
-            case 1 :
-                self.sLevelSelect = 1
-                self.sLevelName = "Normal"
+    # def selectSlevel(self):
+    #     match(self.spiceLevel.get()):
+    #         case 1 :
+    #             self.sLevelSelect = 1
+    #             self.sLevelName = "Normal"
                 
-            case 2 :
-                self.sLevelSelect = 2
-                self.sLevelName = "Medium"
+    #         case 2 :
+    #             self.sLevelSelect = 2
+    #             self.sLevelName = "Medium"
                 
-            case 3 :
-                self.sLevelSelect = 3
-                self.sLevelName = "Hot"
-        print(self.sLevelName , self.sLevelSelect)
+    #         case 3 :
+    #             self.sLevelSelect = 3
+    #             self.sLevelName = "Hot"
+    #     print(self.sLevelName , self.sLevelSelect)
 
         
 
@@ -174,6 +175,12 @@ class App(tk.Tk):
             "firstName_input", "lastName_input","phoneNumber_input","fixedNumber_input", 
             "address_input","HNumber_input" ,"unitNumber_input" ,
         ]
+        if(not self.peymentMethod.get()) :
+            self.errorHandler('pymentMethodError')
+            self.hasError = True
+        if(not self.spiceLevel.get):
+            self.errorHandler('sLevelError')
+            self.hasError = True
         if(self.cityVariable.get() == "" or self.deviveryVar.get() == "" or  self.foodVariable.get() == "" ):
             self.hasError = True 
         for item in requiredItems:
@@ -186,12 +193,30 @@ class App(tk.Tk):
 
         # CTkMessagebox(message="Your Information saved !",
         #           icon="check", option_1="Ok")
- 
+    def getSLevel(self):
+        match self.spiceLevel.get():
+            case 1:
+                return "Normal"
+            case 2:
+                return "Medium"
+            case 3:
+                return "Hot"
+            
+    def getCashier(self):
+        match self.peymentMethod.get():
+            case 1:
+                return "Normal"
+            case 2:
+                return "Medium"
+            case 3:
+                return "Hot"
     def calculation(self):
-        # self.checkRequiredItems()
-        # if(self.hasError):
-        #     self.errorHandler('checkAllItems')
-        #     return False
+        self.checkRequiredItems()
+        if(self.hasError):
+            self.errorHandler('checkAllItems')
+            return False
+        
+        print(self.getSLevel())
         self.price_input.configure(state="normal")
         self.price_input.delete(0 , ttk.END)
         self.total_input.configure(state="normal")
@@ -227,10 +252,14 @@ class App(tk.Tk):
         self.total_input.insert(0 , totalPrice) 
         self.total_input.configure(state="readonly")
         
-    
+   
     def saveOrder(self):
-        order = [self.toppingName , self.OptionalName , self.deviveryVar.get() ]
-        self.saveToFile(self.firstName_input.get()+'-'+self.lastName_input.get() , order)
+        order = [self.toppingName , self.OptionalName , self.deviveryVar.get()  , self.getSLevel() , self.getCashier()]
+        self.saveToFile(self.firstName_input.get()+'_'+self.lastName_input.get() , order)
+        self.cleanData()
+        self.Calculate_btn.configure(state="normal")
+        self.edit_btn.configure(state="disable")
+        self.order_btn.configure(state="disable")
             
     def edit(self):
         self.order_btn.configure(state="disable")
@@ -284,7 +313,9 @@ class App(tk.Tk):
             'numberError' : f"somting wrong :  Please using Number for [ {name} ] fild !",
             'FNameError' : "somting wrong :  Please Select a FOOD !",
             'limitSelectd' : "somting wrong :  You can select 3 items !",
-            'checkAllItems' :  "somting wrong : Please check All Filds " 
+            'checkAllItems' :  "somting wrong : Please check All Filds ",
+            "pymentMethodError" :  "somting wrong : Please Select Pyment Method ",
+            "sLevelError" :  "somting wrong : Please Select Spice Level ",
         }
         CTkMessagebox(title="Warning Message!", message=errors[erorr_key],
                   icon="warning", option_1="Ok",width=600 , justify='cenert' , font=("Arial" , 16 , 'bold') , text_color="#FF0000" , title_color="#ffe600" , corner_radius=0 , sound=True)
@@ -519,13 +550,13 @@ class App(tk.Tk):
         self.lable_spicinessLevel = ttk.Label(self.extraInformation,text="Spiciness Level :"  , padding=(3,3) )
       
         self.normalLevel_radio = ttk.Radiobutton(self.extraInformation,
-                                                 variable=self.spiceLevel  , command=lambda : self.selectSlevel(),
+                                                 variable=self.spiceLevel  ,
                                                   text="Normal", value=1 ,bootstyle="primary-outline-toolbutton")
         self.mediumLevel_radio = ttk.Radiobutton(self.extraInformation, text="Medium",
-                                                 variable=self.spiceLevel, command=lambda : self.selectSlevel(),
+                                                 variable=self.spiceLevel,
                                                   value=2 ,bootstyle="primary-outline-toolbutton")
         self.hotLevel_radio = ttk.Radiobutton(self.extraInformation,
-                                               variable=self.spiceLevel, command=lambda : self.selectSlevel(),
+                                               variable=self.spiceLevel,
                                                text="Hot", value=3 ,bootstyle="primary-outline-toolbutton")
         
 
@@ -605,20 +636,29 @@ class App(tk.Tk):
         #menubar
         self.menubar = Menu(self)
         firstMenu = Menu(self.menubar, tearoff=False)
-        self.menubar.add_cascade(label="First Menu", menu=firstMenu)
-        firstMenu.add_command(label="option 1")
-        firstMenu.add_command(label="Option 2")
+        self.menubar.add_cascade(label="Setting", menu=firstMenu)
+        firstMenu.add_command(label="Calculate" , command=self.calculation)
+        firstMenu.add_command(label="Clear" , command=self.cleanData)
         firstMenu.add_separator()
         firstMenu.add_command(label="Exit" , command=self.closeApp)
         ##-----------------
         secondMenu = Menu(self.menubar, tearoff=False)
-        self.menubar.add_cascade(label="Second Menu", menu=secondMenu)
-        secondMenu.add_command(label="option 1")
-        secondMenu.add_command(label="Option 2")
-        secondMenu.add_separator()
-        secondMenu.add_command(label="Option 3")
+        self.menubar.add_cascade(label="Help", menu=secondMenu)
+        secondMenu.add_command(label="About Us", command = self.aboutUs)
+        
+        stepTow = Menu(secondMenu, tearoff=False)
+        secondMenu.add_cascade(label="Contact us" ,menu=stepTow)
+        stepTow.add_command(label="Tel : 09124610284")
+        stepTow.add_command(label="Tel : 09124610284")
         self.config(menu=self.menubar)
-   
+    
+    def aboutUs(self):
+        newWindow = ttk.Toplevel(self)
+        newWindow.title("About Us")
+        newWindow.geometry("400x300")
+        newWindow.resizable(0, 0)
+        about_label = ttk.Label(newWindow, text="our Restaurant Started in 1370 Jalali DADACH")
+        about_label.grid(row=0, column=0, padx=20, pady=20)
     #Widget Location:
     def location(self):
         #usert Info Frame
